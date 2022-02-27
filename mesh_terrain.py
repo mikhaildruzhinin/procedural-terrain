@@ -1,3 +1,5 @@
+import math
+
 from ursina import (
     Entity,
     load_model,
@@ -5,6 +7,8 @@ from ursina import (
     Vec2,
     Vec3,
 )
+
+from perlin_noise_wrapper import PerlinNoiseWrapper
 
 
 class MeshTerrain:
@@ -14,7 +18,10 @@ class MeshTerrain:
 
         self.subsets = []
         self.num_subsets = 1
-        self.subset_width = 128
+        self.subset_width = 64
+
+        self.terrain_coordinates = {}
+        self.perlin_noise = PerlinNoiseWrapper()
 
         for _ in range(0, self.num_subsets):
             entity = Entity(
@@ -28,12 +35,19 @@ class MeshTerrain:
     def generate_block(self, x, y, z):
         model = self.subsets[0].model
         model.vertices.extend(
-            [Vec3(x, 0, z) + vertex for vertex in self.block.vertices]
+            [Vec3(x, y, z) + vertex for vertex in self.block.vertices]
         )
+
+        model_coordinates = f'x{math.floor(x)}y{math.floor(y)}z{math.floor(z)}'
+        self.terrain_coordinates[model_coordinates] = 't'
 
         # texture atlas coordinates for grass
         uu = 8
         uv = 7
+
+        if y > 2:
+            uu = 8
+            uv = 6
 
         model.uvs.extend(
             [Vec2(uu, uv) + u for u in self.block.uvs]
@@ -46,6 +60,7 @@ class MeshTerrain:
 
         for i in range(-distance, distance):
             for j in range(-distance, distance):
-                self.generate_block(x + i, 0, z + j)
-        
+                y = math.floor(self.perlin_noise.get_height(x + i, z + j))
+                self.generate_block(x + i, y, z + j)
+
         self.subsets[0].model.generate()
