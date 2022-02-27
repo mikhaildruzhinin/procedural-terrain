@@ -6,6 +6,7 @@ from ursina import (
     Sky,
     time,
     Ursina,
+    Vec2,
     window,
 )
 from ursina.prefabs.first_person_controller import FirstPersonController
@@ -13,12 +14,23 @@ from ursina.prefabs.first_person_controller import FirstPersonController
 from mesh_terrain import MeshTerrain
 
 
-def input(key):
+def input(key: str):
     if key == 'escape':
         exit()
 
 
 def update():
+    global count, previous_position
+    count += 1
+    if count == 2:
+        terrain.generate_terrain()
+        count = 0
+
+    if abs(subject.x - previous_position.x) > 4 or \
+    abs(subject.z - previous_position.y) > 4:
+        previous_position = Vec2(subject.x, subject.z)
+        terrain.swirl_engine.reset(previous_position)
+
     is_block_found = False
 
     step = 2
@@ -41,7 +53,10 @@ def update():
 
 
 def main():
-    global subject, terrain
+    global subject, terrain, count, previous_position
+
+    count = 0
+    previous_position = Vec2(0,0)
 
     app = Ursina()
 
@@ -51,9 +66,13 @@ def main():
 
     subject = FirstPersonController()
     subject.gravity = 0.0
+    subject.cursor.visible = False
 
     terrain = MeshTerrain()
     terrain.generate_terrain()
+
+    window.fullscreen = False
+    window.exit_button.enabled = False
 
     app.run()
 

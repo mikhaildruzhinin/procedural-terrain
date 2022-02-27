@@ -1,4 +1,5 @@
 import math
+import random
 
 from ursina import (
     Entity,
@@ -6,40 +7,58 @@ from ursina import (
     Mesh,
     Vec2,
     Vec3,
+    Vec4,
 )
 
 from perlin_noise_wrapper import PerlinNoiseWrapper
+from swirl_engine import SwirlEngine
 
 
 class MeshTerrain:
     def __init__(self):
         self.block = load_model('block.obj')
         self.texture_atlas = 'texture_atlas.png'
+        self.number_vertices = len(self.block.vertices)
 
-        self.subsets = []
-        self.num_subsets = 1
-        self.subset_width = 64
+        self.chunks = []
+        self.number_chunks = 128
+        self.chunk_width = 4 # must be an even number
+        self.swirl_engine = SwirlEngine(self.chunk_width)
+        self.current_chunk = 0
 
         self.terrain_coordinates = {}
+
         self.perlin_noise = PerlinNoiseWrapper()
 
-        for _ in range(0, self.num_subsets):
+        for _ in range(0, self.number_chunks):
             entity = Entity(
                 model=Mesh(),
                 texture=self.texture_atlas
             )
             entity.texture_scale *= 64 / entity.texture.width
 
-            self.subsets.append(entity)
+            self.chunks.append(entity)
 
-    def generate_block(self, x, y, z):
-        model = self.subsets[0].model
+    def generate_block(
+        self,
+        x: int,
+        y: int,
+        z: int,
+    ):
+        model = self.chunks[self.current_chunk].model
         model.vertices.extend(
             [Vec3(x, y, z) + vertex for vertex in self.block.vertices]
         )
 
-        model_coordinates = f'x{math.floor(x)}y{math.floor(y)}z{math.floor(z)}'
-        self.terrain_coordinates[model_coordinates] = 't'
+        block_coordinates = f'x{math.floor(x)}y{math.floor(y)}z{math.floor(z)}'
+        self.terrain_coordinates[block_coordinates] = 't'
+
+        random_tint = random.random() - 0.5
+        model.colors.extend(
+            (
+                Vec4(1 - random_tint, 1 - random_tint, 1 - random_tint, 1),
+            ) * self.number_vertices
+        )
 
         # texture atlas coordinates for grass
         uu = 8
@@ -54,13 +73,23 @@ class MeshTerrain:
         )
 
     def generate_terrain(self):
-        x = 0
-        z = 0
-        distance = int(self.subset_width / 2)
+        x = math.floor(self.swirl_engine.position.x)
+        z = math.floor(self.swirl_engine.position.y)
+
+        distance = int(self.chunk_width / 2)
 
         for i in range(-distance, distance):
             for j in range(-distance, distance):
                 y = math.floor(self.perlin_noise.get_height(x + i, z + j))
-                self.generate_block(x + i, y, z + j)
+                block_coordinates = f'x{math.floor(x + i)}y{math.floor(y)}z{math.floor(z + j)}'
+                if self.terrain_coordinates.get(block_coordinates) != 't':
+                    self.generate_block(x + i, y, z + j)
 
-        self.subsets[0].model.generate()
+        self.chunks[self.current_chunk].model.generate()
+
+        if self.current_chunk < self.number_chunks - 1:
+            self.current_chunk += 1
+        else:
+            self.current_chunk = 0
+
+        self.swirl_engine.move()
