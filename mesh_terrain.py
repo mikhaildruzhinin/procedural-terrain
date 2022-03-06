@@ -10,20 +10,28 @@ from ursina import (
     Vec4,
 )
 
+from config import (
+    BLOCK_MODEL,
+    CHUNK_WIDTH,
+    NUMBER_CHUNKS,
+    TEXTURE_ATLAS,
+    TEXTURE_ATLAS_COORDINATES,
+    TEXTURE_SCALE,
+    TINT_OFFSET,
+)
 from perlin_noise_wrapper import PerlinNoiseWrapper
 from swirl_engine import SwirlEngine
 
 
 class MeshTerrain:
     def __init__(self):
-        self.block = load_model('block.obj')
-        self.texture_atlas = 'texture_atlas.png'
+        self.block = load_model(BLOCK_MODEL)
+        self.texture_atlas = TEXTURE_ATLAS
         self.number_vertices = len(self.block.vertices)
 
         self.chunks = []
-        self.number_chunks = 128
-        self.chunk_width = 4 # must be an even number
-        self.swirl_engine = SwirlEngine(self.chunk_width)
+        self.number_chunks = NUMBER_CHUNKS
+        self.swirl_engine = SwirlEngine(CHUNK_WIDTH)
         self.current_chunk = 0
 
         self.terrain_coordinates = {}
@@ -35,7 +43,7 @@ class MeshTerrain:
                 model=Mesh(),
                 texture=self.texture_atlas
             )
-            entity.texture_scale *= 64 / entity.texture.width
+            entity.texture_scale *= TEXTURE_SCALE / entity.texture.width
 
             self.chunks.append(entity)
 
@@ -53,7 +61,7 @@ class MeshTerrain:
         block_coordinates = f'x{math.floor(x)}y{math.floor(y)}z{math.floor(z)}'
         self.terrain_coordinates[block_coordinates] = 't'
 
-        random_tint = random.random() - 0.5
+        random_tint = random.random() - TINT_OFFSET
         model.colors.extend(
             (
                 Vec4(1 - random_tint, 1 - random_tint, 1 - random_tint, 1),
@@ -61,12 +69,10 @@ class MeshTerrain:
         )
 
         # texture atlas coordinates for grass
-        uu = 8
-        uv = 7
+        uu, uv = TEXTURE_ATLAS_COORDINATES['grass']
 
         if y > 2:
-            uu = 8
-            uv = 6
+            uu, uv = TEXTURE_ATLAS_COORDINATES['snow']
 
         model.uvs.extend(
             [Vec2(uu, uv) + u for u in self.block.uvs]
@@ -76,7 +82,7 @@ class MeshTerrain:
         x = math.floor(self.swirl_engine.position.x)
         z = math.floor(self.swirl_engine.position.y)
 
-        distance = int(self.chunk_width / 2)
+        distance = int(CHUNK_WIDTH / 2)
 
         for i in range(-distance, distance):
             for j in range(-distance, distance):

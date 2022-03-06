@@ -11,6 +11,15 @@ from ursina import (
 )
 from ursina.prefabs.first_person_controller import FirstPersonController
 
+from config import (
+    GENERATE_TERRAIN_FREQUENCY,
+    GRAVITATIONAL_ACCELERATION,
+    HEIGHT,
+    SKY_COLOR_RGB,
+    STEP_SIZE,
+    SUBJECT_GRAVITY,
+    TERRAIN_MARGIN_SIZE,
+)
 from mesh_terrain import MeshTerrain
 
 
@@ -22,19 +31,19 @@ def input(key: str):
 def update():
     global count, previous_position
     count += 1
-    if count == 2:
+    if count == GENERATE_TERRAIN_FREQUENCY:
         terrain.generate_terrain()
         count = 0
 
-    if abs(subject.x - previous_position.x) > 4 or \
-    abs(subject.z - previous_position.y) > 4:
-        previous_position = Vec2(subject.x, subject.z)
-        terrain.swirl_engine.reset(previous_position)
+    if abs(subject.x - previous_position.x) > TERRAIN_MARGIN_SIZE or \
+        abs(subject.z - previous_position.y) > TERRAIN_MARGIN_SIZE:
+            previous_position = Vec2(subject.x, subject.z)
+            terrain.swirl_engine.reset(previous_position)
 
     is_block_found = False
 
-    step = 2
-    height = 1.86
+    step = STEP_SIZE
+    height = HEIGHT
     step_x = math.floor(subject.x + 0.5)
     step_y = math.floor(subject.y + 0.5)
     step_z = math.floor(subject.z + 0.5)
@@ -49,7 +58,7 @@ def update():
     if is_block_found:
         subject.y = lerp(subject.y, target, 6 * time.dt)
     else:
-        subject.y -= 9.8 * time.dt
+        subject.y -= GRAVITATIONAL_ACCELERATION * time.dt
 
 
 def main():
@@ -60,12 +69,13 @@ def main():
 
     app = Ursina()
 
-    window.color = color.rgb(0,200,255)
+    window.color = color.rgb(*SKY_COLOR_RGB)
+
     sky = Sky()
     sky.color = window.color
 
     subject = FirstPersonController()
-    subject.gravity = 0.0
+    subject.gravity = SUBJECT_GRAVITY
     subject.cursor.visible = False
 
     terrain = MeshTerrain()

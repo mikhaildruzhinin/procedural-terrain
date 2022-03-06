@@ -1,16 +1,18 @@
 from perlin_noise import PerlinNoise
 
+from config import (
+    PERLIN_NOISE_AMPLITUDE,
+    PERLIN_NOISE_FREQUENCY,
+    PERLIN_NOISE_OCTAVES,
+    PERLIN_NOISE_SEED,
+)
+
 
 class PerlinNoiseWrapper:
     def __init__(self):
-        self.seed = 123
-        self.octaves = 4
-        self.frequency = 256
-        self.amplitude = 24
-
         self.perlin_noise = PerlinNoise(
-            octaves=self.octaves,
-            seed=self.seed,
+            octaves=PERLIN_NOISE_OCTAVES,
+            seed=PERLIN_NOISE_SEED,
         )
 
     def get_height(
@@ -19,5 +21,5 @@ class PerlinNoiseWrapper:
         z: int,
     ) -> int:
         return self.perlin_noise(
-            [x / self.frequency, z / self.frequency]
-        ) * self.amplitude
+            [x / PERLIN_NOISE_FREQUENCY, z / PERLIN_NOISE_FREQUENCY]
+        ) * PERLIN_NOISE_AMPLITUDE
