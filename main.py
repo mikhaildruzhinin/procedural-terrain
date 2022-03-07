@@ -12,9 +12,13 @@ from ursina import (
 from ursina.prefabs.first_person_controller import FirstPersonController
 
 from config import (
+    FULLSCREEN,
     GENERATE_TERRAIN_FREQUENCY,
     GRAVITATIONAL_ACCELERATION,
     HEIGHT,
+    IS_EXIT_BUTTON_ENABLED,
+    IS_SUBJECT_CURSOR_VISIBLE,
+    LERP_FACTOR,
     SKY_COLOR_RGB,
     STEP_SIZE,
     SUBJECT_GRAVITY,
@@ -56,7 +60,7 @@ def update():
             break
 
     if is_block_found:
-        subject.y = lerp(subject.y, target, 6 * time.dt)
+        subject.y = lerp(subject.y, target, LERP_FACTOR * time.dt)
     else:
         subject.y -= GRAVITATIONAL_ACCELERATION * time.dt
 
@@ -76,13 +80,13 @@ def main():
 
     subject = FirstPersonController()
     subject.gravity = SUBJECT_GRAVITY
-    subject.cursor.visible = False
+    subject.cursor.visible = IS_SUBJECT_CURSOR_VISIBLE
 
     terrain = MeshTerrain()
     terrain.generate_terrain()
 
-    window.fullscreen = False
-    window.exit_button.enabled = False
+    window.fullscreen = FULLSCREEN
+    window.exit_button.enabled = IS_EXIT_BUTTON_ENABLED
 
     app.run()
 

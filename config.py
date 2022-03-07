@@ -8,11 +8,15 @@ GENERATE_TERRAIN_FREQUENCY: int = 2
 TERRAIN_MARGIN_SIZE: int = 4
 STEP_SIZE: int = 2
 HEIGHT: float = 1.86
+LERP_FACTOR: int = 6
 GRAVITATIONAL_ACCELERATION: float = 9.8
 
 # main
 SKY_COLOR_RGB: Tuple[int] = (0, 200, 255)
 SUBJECT_GRAVITY: float = 0.0
+IS_SUBJECT_CURSOR_VISIBLE: bool = False
+FULLSCREEN: bool = False
+IS_EXIT_BUTTON_ENABLED: bool = False
 
 # MeshTerrain
 BLOCK_MODEL: str = 'block.obj'
@@ -25,6 +29,7 @@ TEXTURE_ATLAS_COORDINATES: Dict[str, Tuple[int]] = {
     'grass' : (8, 7),
     'snow': (8, 6),
 }
+SNOW_HEIGHT: int = 2
 
 #PerlinNoiseWrapper
 PERLIN_NOISE_SEED: int = 123

@@ -18,6 +18,7 @@ from config import (
     TEXTURE_ATLAS_COORDINATES,
     TEXTURE_SCALE,
     TINT_OFFSET,
+    SNOW_HEIGHT,
 )
 from perlin_noise_wrapper import PerlinNoiseWrapper
 from swirl_engine import SwirlEngine
@@ -71,7 +72,7 @@ class MeshTerrain:
         # texture atlas coordinates for grass
         uu, uv = TEXTURE_ATLAS_COORDINATES['grass']
 
-        if y > 2:
+        if y > SNOW_HEIGHT:
             uu, uv = TEXTURE_ATLAS_COORDINATES['snow']
 
         model.uvs.extend(
