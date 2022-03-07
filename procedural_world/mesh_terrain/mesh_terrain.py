@@ -10,7 +10,7 @@ from ursina import (
     Vec4,
 )
 
-from config import (
+from procedural_world.config import (
     BLOCK_MODEL,
     CHUNK_WIDTH,
     NUMBER_CHUNKS,
@@ -20,8 +20,8 @@ from config import (
     TINT_OFFSET,
     SNOW_HEIGHT,
 )
-from perlin_noise_wrapper import PerlinNoiseWrapper
-from swirl_engine import SwirlEngine
+from procedural_world.perlin_noise_wrapper import PerlinNoiseWrapper
+from procedural_world.swirl_engine import SwirlEngine
 
 
 class MeshTerrain:

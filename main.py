@@ -11,7 +11,7 @@ from ursina import (
 )
 from ursina.prefabs.first_person_controller import FirstPersonController
 
-from config import (
+from procedural_world.config import (
     FULLSCREEN,
     GENERATE_TERRAIN_FREQUENCY,
     GRAVITATIONAL_ACCELERATION,
@@ -24,7 +24,7 @@ from config import (
     SUBJECT_GRAVITY,
     TERRAIN_MARGIN_SIZE,
 )
-from mesh_terrain import MeshTerrain
+from procedural_world.mesh_terrain import MeshTerrain
 
 
 def input(key: str):

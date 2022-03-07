@@ -1,6 +1,6 @@
 from perlin_noise import PerlinNoise
 
-from config import (
+from procedural_world.config import (
     PERLIN_NOISE_AMPLITUDE,
     PERLIN_NOISE_FREQUENCY,
     PERLIN_NOISE_OCTAVES,
